@@ -250,3 +250,5 @@ plt.show()
 sns.lineplot(x="timestamp", y="eeg", hue="meditation", data=signals, palette="Blues")
 plt.savefig('meditation.png')
 plt.show()
+
+# %%

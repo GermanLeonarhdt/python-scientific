@@ -3,7 +3,6 @@
 Final Assignment
 ==================
 
-Todos los archivos están subidos a campus.
 El largo de los registros es entre 10 y 11 minutos
 Fs = 512
 
@@ -17,7 +16,6 @@ SEGUNDA FECHA DE ENTREGA: 10/08/2024
 |---- EXHALAR ----|
 |---- GOLPES (ESTIMULOS) --------|
 |---- MENTAL IMAGERY ------|
-|---- CERRADOS --------|
 
 * Baseline: esta parte la pueden utilizar para tener ejemplos negativos de cualquier cosa que deseen detectar.  Por 
 ejemplo si quieren detectar que algo cambia cuando hay "imaginación en colores violeta", extraen features de ese momento y de
@@ -26,7 +24,10 @@ este e intentan armar un clasificador.
 * Exhalar: Idem pero enfatizando el movimiento del diafragma para exhalar.
 * Golpes: Deberían aparecer algún evento con cierto pico en la señal.  Pueden intentar detectar estos picos y ver si hay algo.
 * Mental Imagery: Pueden aparecer frecuencias altas de 20-50 Hz.  Aumentos en la potencia de estas bandas entre este bloque y el baseline.
-* Cerrados: Debería aparecer un aumento en la frecuencia particular de 10 Hz en relación al baseline.
+
+
+Los datos, el registro de EEG y el video, están disponibles en el siguiente link:
+https://drive.google.com/file/d/1ByQDK4ZPxbqw7T17k--avTcgSCCzs3vi/view?usp=sharing
 
 Objetivo:
 El objetivo es dado este registro implementar un análisis de estos datos, exploratorio, superviado 
@@ -46,7 +47,7 @@ from io import StringIO
 
 # El protocolo experimental que implementamos tiene 2 datasets:
 # 1- Dataset de las señales de EEG
-# 2- El video de las imágenes (de la grabación de la clase)
+# 2- El video de las imágenes.
 #
 #
 # La idea es tomar estos datasets y derivar de forma automática las diferentes secciones.  Esto se puede hacer en base self-supervised, es
@@ -54,7 +55,7 @@ from io import StringIO
 #
 # Tienen que entregar un PDF, tipo Markdown con código, gráficos y cualquier insight obtenido del dataset.
 
-signals = pd.read_csv('data/blinking.dat', delimiter=' ', names = ['timestamp','counter','eeg','attention','meditation','blinking'])
+signals = pd.read_csv('data/pestaneos.dat', delimiter=' ', names = ['timestamp','counter','eeg','attention','meditation','blinking'])
 
 print('Estructura de la informacion:')
 print(signals.head())
