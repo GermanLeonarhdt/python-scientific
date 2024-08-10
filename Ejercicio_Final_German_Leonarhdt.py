@@ -1,7 +1,7 @@
 
 # EJercicio final  - Germán Leonarhdt
 
-print(__doc__)
+print(__doc__) 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,7 +17,8 @@ baseline = baseline.values
 baseline_eeg = baseline[:,2]
 
 print('Baseline - Estructura de la informacion:')
-print(baseline.head())
+baseline_df = pd.DataFrame(baseline)
+print(baseline_df.head())
 
 
 # Pestañeos
@@ -26,30 +27,27 @@ pestaneos = pestaneos.values
 pestaneos_eeg = pestaneos[:,2]
 
 print('Pestañeos - Estructura de la informacion:')
-print(pestaneos.head())
+pestaneos_df = pd.DataFrame(pestaneos)
+print(pestaneos_df.head())
 
 
 # Chequeamos nulos y duplicados
 
-# Nulos
-
 # Baseline
 baseline_df = pd.DataFrame(baseline)
-print('El dataset de Baseline tiene',len(baseline_df),'observaciones')
 baseline_nonulls = baseline_df.dropna()
-print('Y si removemos nulos ',len(baseline_nonulls),'observaciones, la misma cantidad')
 baseline_null=baseline_df.isnull().sum().sum()
-print('Es decir, el dataset de Baseline tiene',baseline_null,'nulos.')
+baseline_noduplicates = baseline_df.drop_duplicates()
+print('El dataset de Baseline tiene',len(baseline_df),'observaciones. Y si removemos nulos ',len(baseline_nonulls),'observaciones, la misma cantidad. Es decir, el dataset de Baseline tiene',baseline_null,'nulos.')
+print('Si removemos duplicados,',len(baseline_noduplicates),'observaciones, tambien la misma cantidad')
 
-
-
-baseline_nonulls = baseline.dropna()
-print(baseline_nonulls)
-
-print('The same as')
-
-print(data[data.notnull()])
-
+# Pestañeos
+pestaneos_df = pd.DataFrame(pestaneos)
+pestaneos_nonulls = pestaneos_df.dropna()
+pestaneos_null=pestaneos_df.isnull().sum().sum()
+pestaneos_noduplicates = pestaneos_df.drop_duplicates()
+print('El dataset de Pestañeos tiene',len(pestaneos_df),'observaciones. Y si removemos nulos ',len(pestaneos_nonulls),'observaciones, la misma cantidad','Es decir, el dataset de Pestañeos tiene',pestaneos_null,'nulos.')
+print('Y si removemos duplicados,',len(pestaneos_noduplicates),'observaciones, tambien la misma cantidad')
 
 
 
@@ -175,6 +173,7 @@ from scipy.signal import firwin, remez, kaiser_atten, kaiser_beta
 from scipy.signal import butter, filtfilt, buttord
 
 from scipy.signal import butter, lfilter
+from scipy.fft import rfft, rfftfreq
 
 
 
@@ -266,6 +265,8 @@ plt.savefig('images/pestaneos_spectral.png')
 plt.show()
 
 # Filtro espacial
+
+
 # Baseline
 baseline = pd.read_csv('data/baseline.dat', delimiter=' ', names = ['timestamp','counter','eeg','attention','meditation','blinking'])
 baseline = baseline.values
@@ -276,11 +277,17 @@ pestaneos = pd.read_csv('data/pestaneos.dat', delimiter=' ', names = ['timestamp
 pestaneos = pestaneos.values
 pestaneos_eeg = pestaneos[:,2]
 
+min_length = min(len(baseline_eeg), len(pestaneos_eeg))
+
+baseline_eeg_ICA = baseline_eeg[:min_length]
+pestaneos_eeg_ICA = pestaneos_eeg[:min_length]
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 
 from sklearn.decomposition import FastICA, PCA
+
 
 S = np.c_[baseline_eeg, pestaneos_eeg]
 
@@ -289,13 +296,14 @@ S_ = ica.fit_transform(S)  # Reconstruct signals
 A_ = ica.mixing_  # Get estimated mixing matrix
 assert np.allclose(S, np.dot(S_, A_.T) + ica.mean_)
 
-plt.figure(4)
-plt.title('ICA 1')
-plt.subplot(2,1,1)
-plt.plot(S_[:,0], color='red')
-plt.title('ICA 2')
-plt.subplot(2,1,2)
-plt.plot(S_[:,1], color='steelblue')
+plt.figure(figsize=(10, 6)) 
+plt.subplot(2, 1, 1)
+plt.plot(S_[:, 0], color='red')
+plt.title('ICA 1')  
+plt.subplot(2, 1, 2)
+plt.plot(S_[:, 1], color='steelblue')
+plt.title('ICA 2') 
+plt.tight_layout()
 plt.show()
 
 # Signal Features
@@ -694,6 +702,7 @@ for i in range(len(pestaneos_eeg)):
         filtro_eeg.append(0)
         
 print("Blinking counter: {}".format(contador))
+
 filtro_eeg=np.asarray(filtro_eeg)
 plt.figure(figsize=(16,5))
 plt.plot(filtro_eeg,color="blue")
@@ -812,9 +821,7 @@ plt.plot(np.zeros_like(eeg), "--", color="gray")
 plt.show()
 
 
-# Tomo lo realizado en el scrip del Alumno: Francisco Seguí https://github.com/fseguior/
-
-# Copy-paste
+# Tomo lo realizado en el scrip del Alumno: Francisco Seguí https://github.com/fseguior/:
 # Propongo una forma alternativa de delimitar dinámicamente los umbrales de detección de pestañeo
 # Calculo los límites inferiores y superiores utilizando una medida de posición
 # En este caso uso el percentil 1 y el 99, con lo cual se consideran como picos el 2% de los valores
